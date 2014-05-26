@@ -83,7 +83,7 @@ function! DoIndentPrev(ind,str)
     let last = last + 1
 
     if match(str, s:expr_left) != -1
-      let ind_add += 1
+      let ind_add += 2
     else
       if start_with_expr_right == 0
         let ind_dec += 1
@@ -147,7 +147,7 @@ function! DoIndent(ind, str, pline)
     let start_with_expr_right = num
     " If start with expr right, then indent as more as possible.
     if start_with_expr_right
-      let num = len(split(line, s:expr_right, 1)) - 1
+      let num = len(split(line, s:expr_right, 1))
     endif
     let ind = ind - &sw * num
   endif
@@ -171,7 +171,7 @@ function! DoIndent(ind, str, pline)
   if (match(line, s:expr_comma_start) != -1)
     let ind = ind - 2
     if (match(pline, s:expr_var) != -1)
-      let ind = ind + 4
+      let ind = ind + 2
     endif
   endif
 
