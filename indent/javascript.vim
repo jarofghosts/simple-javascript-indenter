@@ -47,6 +47,7 @@ let s:expr_case          = '\s\+\(case\s\+[^\:]*\|default\)\s*:\s*'
 let s:expr_comment_start = '/\*c'
 let s:expr_comment_end   = 'c\*/'
 
+let s:expr_special = '\s*\(function\s\|for_\|if_\)'
 let s:expr_comma_start = '^\s*,'
 let s:expr_var = '^\s*var\s'
 let s:expr_var_stop = ';'
@@ -83,10 +84,19 @@ function! DoIndentPrev(ind,str)
     let last = last + 1
 
     if match(str, s:expr_left) != -1
-      let ind_add += 2
+      if match(pline, s:expr_special) == -1
+        let ind_add += 2
+      else
+        echo 'wee'
+        let ind_add += 1
+      endif
     else
       if start_with_expr_right == 0
-        let ind_dec += 1
+        if match(pline, s:expr_special) == -1
+          let ind_dec -= 1
+        else
+          let ind_dec += 1
+        endif
       endif
     endif
 
@@ -147,7 +157,11 @@ function! DoIndent(ind, str, pline)
     let start_with_expr_right = num
     " If start with expr right, then indent as more as possible.
     if start_with_expr_right
-      let num = len(split(line, s:expr_right, 1))
+      if match(pline, s:expr_comma_first) != -1
+        let num = len(split(line, s:expr_right, 1))
+      else
+        let ind = ind - 2
+      endif
     endif
     let ind = ind - &sw * num
   endif
