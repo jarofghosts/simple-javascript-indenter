@@ -42,12 +42,14 @@ endif
 let s:expr_left  = '[[{(]'
 let s:expr_right = '[)}\]]'
 let s:expr_all   = '[[{()}\]]'
+let s:expr_stallman = '})\+'
 
 let s:expr_case          = '\s\+\(case\s\+[^\:]*\|default\)\s*:\s*'
 let s:expr_comment_start = '/\*c'
 let s:expr_comment_end   = 'c\*/'
 
-let s:expr_special = '\s*\(function\s\|for_\|if_\)'
+let s:expr_special = '\s*\([,_]*function\s*\|for_\|if_\)'
+let s:nested_function = '[,(]\+\s*function[\s_]'
 let s:expr_comma_start = '^\s*,'
 let s:expr_var = '^\s*var\s'
 let s:expr_var_stop = ';'
@@ -87,8 +89,10 @@ function! DoIndentPrev(ind,str)
       if match(pline, s:expr_special) == -1
         let ind_add += 2
       else
-        echo 'wee'
         let ind_add += 1
+      endif
+      if match(pline, s:nested_function) != -1
+        let ind_add = 1
       endif
     else
       if start_with_expr_right == 0
@@ -162,6 +166,9 @@ function! DoIndent(ind, str, pline)
       else
         let ind = ind - 2
       endif
+    endif
+    if match(line, s:expr_stallman) != -1
+      let num = 1
     endif
     let ind = ind - &sw * num
   endif
